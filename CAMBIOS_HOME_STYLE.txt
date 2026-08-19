@@ -1,0 +1,22 @@
+CAMBIOS REALIZADOS - HOME STYLE
+
+1. Cancelación de pedidos por cliente
+- El endpoint POST /api/pedidos/{pedidoId}/cancelar ya existía y se reforzó el flujo.
+- Solo se pueden cancelar pedidos PENDIENTES y pertenecientes al usuario autenticado.
+- Al cancelar, se intenta invalidar la preferencia de Mercado Pago asociada.
+
+2. Protección ante pagos tardíos
+- Si Mercado Pago notifica un pago APROBADO para un pedido ya CANCELADO,
+  el backend intenta reembolsar automáticamente el pago y conserva el pedido CANCELADO.
+
+3. Mercado Pago
+- La URL del webhook dejó de estar fija dentro de MercadoPagoServiceImpl.
+- Ahora se configura con mercadopago.notification-url.
+- Puedes definir la variable de entorno MERCADOPAGO_NOTIFICATION_URL con la URL actual de ngrok.
+- Las preferencias ahora vencen después de 30 minutos (configurable).
+
+IMPORTANTE PARA PROBAR:
+- MERCADOPAGO_ACCESS_TOKEN debe ser el token de prueba del vendedor/aplicación.
+- Usa una cuenta de prueba COMPRADOR diferente a la cuenta vendedora.
+- Prueba Checkout Pro desde una ventana de incógnito.
+- Si cambia tu URL de ngrok, actualiza MERCADOPAGO_NOTIFICATION_URL antes de iniciar Spring Boot.
