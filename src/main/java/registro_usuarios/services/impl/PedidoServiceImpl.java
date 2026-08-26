@@ -795,6 +795,14 @@ public class PedidoServiceImpl implements PedidoService {
         pedidoRepository.save(pedido);
 
         /*
+         * Al cancelar un pedido pendiente de Mercado Pago, quitamos del
+         * carrito únicamente las cantidades que pertenecían a ese pedido.
+         * No se modifica el stock, porque el inventario solo se descuenta
+         * cuando Mercado Pago confirma un pago aprobado.
+         */
+        quitarProductosDelPedidoDelCarrito(pedido, usuario);
+
+        /*
          * Si este pedido tenía una preferencia de Checkout Pro, intentamos
          * invalidarla para que el enlace de pago anterior deje de ser útil.
          * Si Mercado Pago rechaza la actualización, la cancelación local se
@@ -804,5 +812,40 @@ public class PedidoServiceImpl implements PedidoService {
                 pedido.getMercadoPagoPreferenceId()
         );
     }
+
+    private void quitarProductosDelPedidoDelCarrito(Pedido pedido, Usuario usuario) {
+
+        Carrito carrito = carritoRepository.findByUsuarioId(usuario.getId())
+                .orElse(null);
+
+        if (carrito == null || carrito.getItems().isEmpty()) {
+            return;
+        }
+
+        for (DetallePedido detalle : pedido.getDetalles()) {
+
+            CarritoItem itemCarrito = carrito.getItems()
+                    .stream()
+                    .filter(item -> item.getProducto().getId()
+                            .equals(detalle.getProducto().getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (itemCarrito == null) {
+                continue;
+            }
+
+            int cantidadRestante = itemCarrito.getCantidad() - detalle.getCantidad();
+
+            if (cantidadRestante <= 0) {
+                carrito.getItems().remove(itemCarrito);
+            } else {
+                itemCarrito.setCantidad(cantidadRestante);
+            }
+        }
+
+        carritoRepository.save(carrito);
+    }
+
 
 }
