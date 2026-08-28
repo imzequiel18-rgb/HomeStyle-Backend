@@ -30,13 +30,13 @@ public class UsuarioService {
     @Autowired
     private JwtService jwtService;
 
-
+    //registra nuevo usuario
     public UsuarioDTO agregar(Usuario usuario){
 
-        usuario.setPassword(
-                passwordEncoder.encode(usuario.getPassword())
-        );
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
 
+        //dentro de la variable "guardado" se almacena el objeto de usuario
+        //usando los metodos del reporitory
         Usuario guardado = repository.save(usuario);
 
         return convertirDTO(guardado);
