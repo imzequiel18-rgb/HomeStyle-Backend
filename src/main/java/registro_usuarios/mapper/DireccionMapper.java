@@ -1,11 +1,10 @@
 package registro_usuarios.mapper;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.stereotype.Component;
 import registro_usuarios.dto.DireccionDTO;
 import registro_usuarios.entities.Direccion;
-import registro_usuarios.entities.Usuario;
+
 
 @Component
 public class DireccionMapper {
@@ -13,9 +12,7 @@ public class DireccionMapper {
     public DireccionDTO toDTO(Direccion direccion){
 
         if(direccion == null){
-
             return null;
-
         }
 
         return DireccionDTO.builder()
@@ -49,7 +46,6 @@ public class DireccionMapper {
                 .predeterminada(direccion.getPredeterminada())
 
                 .build();
-
     }
 
 }
